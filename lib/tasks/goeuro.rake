@@ -21,7 +21,7 @@ namespace :goeuro do
   task get_flight_details: :environment do 
     cities_name = ["London","Paris","Rome","Dublin","Madrid","Barcelona","Frankfurt","Milan","Athens","Amsterdam"]
     cities = ["LHR","CDG","FCO","DUB","MAD","BCN","FRA","MXP","ATH","AMS"]
-    city_combination =  cities.combination(2).to_a
+    city_combination =  cities.permutation(2).to_a
     city_combination.each do |city|
       @count = 0
       arrival = City.find_by(:iata_airport_code => city[0]).city_id
@@ -114,7 +114,7 @@ namespace :goeuro do
   task get_train_details: :environment do 
     cities_name = ["London","Paris","Rome","Dublin","Madrid","Barcelona","Frankfurt","Milan","Athens","Amsterdam"]
     cities = ["LHR","CDG","FCO","DUB","MAD","BCN","FRA","MXP","ATH","AMS"]
-    city_combination =  cities_name.combination(2).to_a
+    city_combination =  cities_name.permutation(2).to_a 
     city_combination.each do |city|
       @count = 0
       arrival = City.find_by(:name => city[0]).city_id
