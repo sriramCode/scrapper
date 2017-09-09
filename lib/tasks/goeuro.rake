@@ -96,7 +96,6 @@ namespace :goeuro do
         Flight.create(:name => name, :source => source, :destination => destination, :source_iata_code => source_iata_code, :destination_iata_code => destination_iata_code, :dump => dump.to_json)
       end
     end
-  end
 
 
 
@@ -187,7 +186,6 @@ namespace :goeuro do
         Train.create(:name => name, :source => source, :destination => destination, :dump => dump.to_json)
       end
     end
-  end
 
 
 
@@ -201,19 +199,19 @@ namespace :goeuro do
 
 
 
-  def get_response(mode)
-    sleep(2.0)
-    response = HTTParty.get("https://www.goeuro.com/GoEuroAPI/rest/api/v5/results?price_from=1&stops=0%7C1%7C2%3B-1&travel_mode=#{mode}&limit=30&offset=0&position_report_enabled=true&all_positions=true&include_price_details=true&include_transit=false&include_nearby_airports=null&sort_by=price&sort_variants=price&use_stats=true&use_recommendation=true&search_id=#{@search_id}",{:headers =>{'Content-Type' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'Cookie' => @cookie, 'User-Agent' => @uAgent}})
-    @count += 1
-    if response["outbounds"].count > 0 || @count > 20
-      return response
-    else
-      @uAgent = @user_agent.sample
-      get_response
+      def get_response(mode)
+        sleep(2.0)
+        response = HTTParty.get("https://www.goeuro.com/GoEuroAPI/rest/api/v5/results?price_from=1&stops=0%7C1%7C2%3B-1&travel_mode=#{mode}&limit=30&offset=0&position_report_enabled=true&all_positions=true&include_price_details=true&include_transit=false&include_nearby_airports=null&sort_by=price&sort_variants=price&use_stats=true&use_recommendation=true&search_id=#{@search_id}",{:headers =>{'Content-Type' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'Cookie' => @cookie, 'User-Agent' => @uAgent}})
+        @count += 1
+        if response["outbounds"].count > 0 || @count > 10
+          return response
+        else
+          @uAgent = @user_agent.sample
+          get_response(mode)
+        end
+      end
+
     end
-  end
-
-end
 
 
 
