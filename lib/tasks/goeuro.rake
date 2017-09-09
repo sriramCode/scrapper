@@ -43,19 +43,17 @@ namespace :goeuro do
         "Mozilla/5.0 (Macintosh; U; PPC Mac OS X; fr-fr) AppleWebKit/312.5 (KHTML, like Gecko) Safari/312.3",
         "Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/418.8 (KHTML, like Gecko) Safari/419.3"]
 
+        uAgent = user_agent.sample
         search_id = HTTParty.post("https://www.goeuro.com/GoEuroAPI/rest/api/v5/searches",
         { 
           :body => {"searchOptions" => {"departurePosition" => {"id" => arrival},"arrivalPosition" => {"id" => departure},"travelModes" => ["Flight","Train","Bus"],"departureDate" => "2017-09-09","passengers" => [{"age" => 12,"discountCards" => []}],"userInfo" => {"identifier" => "0.hkfmyj74wa9","domain" => ".com","locale" => "en","currency" => "EUR"},"abTestParameters" => ["","APIV5_TRIGGER"]}}.to_json,
-          :headers => { 'Content-Type' => 'application/json', 'Cookie' => cookie, 'User-Agent' => user_agent.sample, 'Connection' => 'keep-alive', 'Content-Length' => '327', 'Referer' => 'https://www.goeuro.com/travel-search2/results/#{search_id}/train' }
+          :headers => { 'Content-Type' => 'application/json', 'Cookie' => cookie, 'User-Agent' => uAgent }
           }).parsed_response["searchId"]
 
         puts search_id
-        response = HTTParty.get("https://www.goeuro.com/GoEuroAPI/rest/api/v5/results?price_from=1&stops=0%7C1%7C2%3B-1&travel_mode=flight&limit=10&offset=0&position_report_enabled=true&all_positions=true&include_price_details=true&include_transit=false&include_nearby_airports=null&sort_by=price&sort_variants=price&use_stats=true&use_recommendation=true&search_id=#{search_id}"),{ 
-          :headers => { 'Content-Type' => 'application/json', 'Cookie' => cookie, 'User-Agent' => user_agent.sample, 'Connection' => 'keep-alive', 'Content-Length' => '327', 'Referer' => 'https://www.goeuro.com/travel-search2/results/#{search_id}/train' }
-        }
+        sleep(2.0)
+        response = HTTParty.get("https://www.goeuro.com/GoEuroAPI/rest/api/v5/results?price_from=1&stops=0%7C1%7C2%3B-1&travel_mode=flight&limit=10&offset=0&position_report_enabled=true&all_positions=true&include_price_details=true&include_transit=false&include_nearby_airports=null&sort_by=price&sort_variants=price&use_stats=true&use_recommendation=true&search_id=#{search_id}",{:headers =>{'Content-Type' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'Cookie' => cookie, 'User-Agent' => uAgent}})
 
-        binding.pry
-        response = response[0]
         name = response["positions"][response["query"]["departurePosition"]]["name"] + " - " + response["positions"][response["query"]["arrivalPosition"]]["name"]
         puts name
         source = response["positions"][response["query"]["departurePosition"]]["name"]
@@ -82,7 +80,6 @@ namespace :goeuro do
 
           end
           dump << flight_detail
-          binding.pry
         end
         Flight.create(:name => name, :source => source, :destination => destination, :source_iata_code => source_iata_code, :destination_iata_code => destination_iata_code, :dump => dump.to_json)
       end
