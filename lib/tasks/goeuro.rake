@@ -19,7 +19,7 @@ namespace :goeuro do
       CS.states(country_code).each do |key,value|
         CS.cities(key, country_code).each do |city|
           puts city
-          city = city.gsub(/\s+/, '%20')
+          # city = city.gsub(/\s+/, '%20')
           url = "https://www.goeuro.com/suggester-api/v2/position/suggest/en/#{city}"
           encoded_url = URI.encode(url)
           @search_count = 0
@@ -202,6 +202,7 @@ namespace :goeuro do
       end
 
       def get_search_response(url)
+        binding.pry
         response = HTTParty.get(URI.parse(url))
         @search_count += 1
         if response.count > 0 || @search_count > 2
