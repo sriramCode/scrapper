@@ -11,7 +11,7 @@ namespace :goeuro do
   end
 
 
-  task auto_search: :environment do
+  task auto_search1: :environment do
     country_list = ["Albania","Andorra","Armenia","Austria","Azerbaijan","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Greenland","Hungary","Iceland","Ireland","Italy","Kosovo","Latvia","Liechtenstein","Lithuania","Luxembourg","Macedonia","Malta","Moldova","Monaco","Montenegro","Netherlands","Norway","Poland","Portugal","Romania","Russia","San Marino","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Turkey","Ukraine","United Kingdom"]
     country_list.each do |country|
       puts "Country name: " + country
@@ -22,8 +22,8 @@ namespace :goeuro do
           # city = city.gsub(/\s+/, '%20')
           url = "https://www.goeuro.com/suggester-api/v2/position/suggest/en/#{city}"
           encoded_url = URI.encode(url)
-          @search_count = 0
-          response = get_search_response(encoded_url)
+          @search_count1 = 0
+          response = get_search_response1(encoded_url)
           response.parsed_response.each do |city|
             City.find_or_create_by("city_id" => city["_id"],"name" => city["name"], "fullName" => city["fullName"], "country" => city["country"], "latitude" => city["geo_position"]["latitude"], "longitude" => city["geo_position"]["longitude"],"locationId" => city["locationId"], "inEurope" => city["inEurope"], "countryId" => city["countryId"], "countryCode" => city["countryCode"],"coreCountry" => city["coreCountry"],"city_type" => city["type"],"iata_airport_code" => city["iata_airport_code"])
           end
@@ -32,6 +32,24 @@ namespace :goeuro do
       end
       puts "------------------------------------------------"
     end
+  end
+
+  task auto_search_airport: :environment do
+    
+    airports = ["TIA","EVN","GRZ","INN","KLU","LNZ","SZG","VIE","GYD","MSQ","ANR","BRU","CRL","LGG","OST","SJJ","TZL","BOJ","SOF","VAR","DBV","PUY","SPU","ZAD","ZAG","LCA","PFO","BRQ","PRG","AAL","AAR","BLL","CPH","TLL","HEL","OUL","RVN","TMP","TKU","VAA","AJA","BSL","MLH","EAP","BIA","EGC","BIQ","BOD","BES","FSC","LIL","LYS","MRS","MPL","NTE","NCE","BVA","CDG","ORY","SXB","TLN","TLS","TBS","FMM","BER","SXF","TXL","BRE","CGN","DTM","DRS","DUS","FRA","FDH","HHN","HAM","HAJ","FKB","LEJ","MUC","FMO","NUE","PAD","STR","NRN","ATH","CHQ","CFU","HER","KGS","RHO","SKG","BUD","DEB","KEF","ORK","DUB","NOC","KIR","SNN","AHO","AOI","BRI","BGY","BLQ","BDS","CAG","CTA","CIY","FLR","GOA","SUF","LIN","MXP","NAP","OLB","PMO","PEG","PSR","PSA","CIA","FCO","TPS","TSF","TRN","VCE","VRN","ALA","TSE","RIX","KUN","VNO","LUX","SKP","MLA","KIV","TGD","TIV","AMS","EIN","GRQ","MST","RTM","AES","BGO","BOO","HAU","KRS","RYG","OSL","TRF","SVG","TOS","TRD","GDN","KTW","KRK","WMI","POZ","WAW","WRO","FAO","LIS","FNC","PDL","OPO","OTP","CLJ","TSR","SVX","DME","SVO","VKO","LED","AER","BEG","PRN","BTS","LJU","ALC","LEI","BCN","BIO","FUE","GRO","LPA","IBZ","XRY","ACE","MAD","AGP","PMI","MAH","MJV","REU","SDR","SCQ","SVQ","TFN","TFS","VLC","ZAZ","GOT","MMX","ARN","BMA","NYO","VST","BRN","GVA","LUG","ZRH","ADA","ESB","AYT","DLM","IST","SAW","ADB","BJV","TZX","KBP","IEV","ODS","ABZ","BHD","BFS","BHX","BRS","CWL","EMA","EDI","GLA","PIK","HUY","JER","LBA","LPL","LCY","LGW","LHR","LTN","SEN","STN","MAN","SOU","NCL"]
+
+        airports.each do |airport|
+          puts airport
+          url = "https://www.goeuro.com/suggester-api/v2/position/suggest/en/#{airport}"
+          @search_count = 0
+          response = get_search_response(url)
+          response.parsed_response.each do |city|
+            City.find_or_create_by("city_id" => city["_id"],"name" => city["name"], "fullName" => city["fullName"], "country" => city["country"], "latitude" => city["geo_position"]["latitude"], "longitude" => city["geo_position"]["longitude"],"locationId" => city["locationId"], "inEurope" => city["inEurope"], "countryId" => city["countryId"], "countryCode" => city["countryCode"],"coreCountry" => city["coreCountry"],"city_type" => city["type"],"iata_airport_code" => city["iata_airport_code"])
+          end
+          puts response.count
+        end
+
+
   end
 
   task get_flight_details: :environment do 
@@ -202,7 +220,7 @@ namespace :goeuro do
       end
 
       def get_search_response(url)
-        response = HTTParty.get(URI.parse(url))
+        response = HTTParty.get(url)
         @search_count += 1
         if response.count > 0 || @search_count > 2
           return response
