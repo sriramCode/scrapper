@@ -11,10 +11,8 @@ namespace :goeuro do
   end
 
 
-  task auto_search1: :environment do
-    # country_list = ["Albania","Andorra","Armenia","Austria","Azerbaijan","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Greenland","Hungary","Iceland","Ireland","Italy","Kosovo"]
-
-    country_list = ["Latvia","Liechtenstein","Lithuania","Luxembourg","Macedonia","Malta","Moldova","Monaco","Montenegro","Netherlands","Norway","Poland","Portugal","Romania","Russia","San Marino","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Turkey","Ukraine","United Kingdom"]
+  task auto_search: :environment do
+    country_list = ["Albania","Andorra","Armenia","Austria","Azerbaijan","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Greenland","Hungary","Iceland","Ireland","Italy","Kosovo","Latvia","Liechtenstein","Lithuania","Luxembourg","Macedonia","Malta","Moldova","Monaco","Montenegro","Netherlands","Norway","Poland","Portugal","Romania","Russia","San Marino","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Turkey","Ukraine","United Kingdom"]
     country_list.each do |country|
       puts "Country name: " + country
       country_code = CS.countries.select{|key, hash| hash == country }.keys[0]
@@ -24,35 +22,12 @@ namespace :goeuro do
           city = city.gsub(/\s+/, '%20')
           url = "https://www.goeuro.com/suggester-api/v2/position/suggest/en/#{city}"
           encoded_url = URI.encode(url)
-          response = HTTParty.get(URI.parse(encoded_url))
+          @search_count = 0
+          response = get_search_response(encoded_url)
           response.parsed_response.each do |city|
             City.find_or_create_by("city_id" => city["_id"],"name" => city["name"], "fullName" => city["fullName"], "country" => city["country"], "latitude" => city["geo_position"]["latitude"], "longitude" => city["geo_position"]["longitude"],"locationId" => city["locationId"], "inEurope" => city["inEurope"], "countryId" => city["countryId"], "countryCode" => city["countryCode"],"coreCountry" => city["coreCountry"],"city_type" => city["type"],"iata_airport_code" => city["iata_airport_code"])
           end
           puts response.count
-        end
-      end
-      puts "------------------------------------------------"
-    end
-  end
-
-  task auto_search2: :environment do
-    country_list = ["Albania","Andorra","Armenia","Austria","Azerbaijan","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Greenland","Hungary","Iceland","Ireland","Italy","Kosovo"]
-
-    # country_list = ["Latvia","Liechtenstein","Lithuania","Luxembourg","Macedonia","Malta","Moldova","Monaco","Montenegro","Netherlands","Norway","Poland","Portugal","Romania","Russia","San Marino","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Turkey","Ukraine","United Kingdom"]
-    country_list.each do |country|
-      puts "Country name: " + country
-      country_code = CS.countries.select{|key, hash| hash == country }.keys[0]
-      CS.states(country_code).each do |key,value|
-        CS.cities(key, country_code).each do |city|
-          puts city
-          city = city.gsub(/\s+/, '%20')
-          url = "https://www.goeuro.com/suggester-api/v2/position/suggest/en/#{city}"
-          encoded_url = URI.encode(url)
-          response = HTTParty.get(URI.parse(encoded_url))
-          response.parsed_response.each do |city|
-            City.find_or_create_by("city_id" => city["_id"],"name" => city["name"], "fullName" => city["fullName"], "country" => city["country"], "latitude" => city["geo_position"]["latitude"], "longitude" => city["geo_position"]["longitude"],"locationId" => city["locationId"], "inEurope" => city["inEurope"], "countryId" => city["countryId"], "countryCode" => city["countryCode"],"coreCountry" => city["coreCountry"],"city_type" => city["type"],"iata_airport_code" => city["iata_airport_code"])
-          end
-         puts response.count
         end
       end
       puts "------------------------------------------------"
@@ -223,6 +198,16 @@ namespace :goeuro do
         else
           @uAgent = @user_agent.sample
           get_response(mode)
+        end
+      end
+
+      def get_search_response(url)
+        response = HTTParty.get(URI.parse(url))
+        @search_count += 1
+        if response.count > 0 || @search_count > 2
+          return response
+        else
+          get_search_response(url)
         end
       end
 
