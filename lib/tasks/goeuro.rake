@@ -202,7 +202,6 @@ namespace :goeuro do
       end
 
       def get_search_response(url)
-        binding.pry
         response = HTTParty.get(URI.parse(url))
         @search_count += 1
         if response.count > 0 || @search_count > 2
