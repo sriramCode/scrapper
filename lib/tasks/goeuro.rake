@@ -17,8 +17,11 @@ namespace :goeuro do
       country_code = CS.countries.select{|key, hash| hash == country }.keys[0]
       CS.states(country_code).each do |key,value|
         CS.cities(key, country_code).each do |city|
+          binding.pry
           city = city.gsub(/\s+/, '%20')
-          response = HTTParty.get("https://www.goeuro.com/suggester-api/v2/position/suggest/en/#{city}")
+          url = "https://www.goeuro.com/suggester-api/v2/position/suggest/en/#{city}"
+          encoded_url = URI.encode(url)
+          response = HTTParty.get(URI.parse(encoded_url))
           response.parsed_response.each do |city|
             City.find_or_create_by("city_id" => city["_id"],"name" => city["name"], "fullName" => city["fullName"], "country" => city["country"], "latitude" => city["geo_position"]["latitude"], "longitude" => city["geo_position"]["longitude"],"locationId" => city["locationId"], "inEurope" => city["inEurope"], "countryId" => city["countryId"], "countryCode" => city["countryCode"],"coreCountry" => city["coreCountry"],"city_type" => city["type"],"iata_airport_code" => city["iata_airport_code"])
           end
