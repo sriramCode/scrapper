@@ -29,6 +29,7 @@ gem 'jbuilder', '~> 2.5'
 gem 'nokogiri', '~> 1.6', '>= 1.6.8'
 gem 'httparty', '~> 0.13.7'
 gem 'pry', '~> 0.10.4'
+gem 'city-state'
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 3.0'
 # Use ActiveModel has_secure_password

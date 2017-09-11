@@ -10,6 +10,23 @@ namespace :goeuro do
     end
   end
 
+
+  task auto_search: :environment do
+    country_list = ["Albania","Andorra","Armenia","Austria","Azerbaijan","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Greenland","Hungary","Iceland","Ireland","Italy","Kosovo","Latvia","Liechtenstein","Lithuania","Luxembourg","Macedonia","Malta","Moldova","Monaco","Montenegro","Netherlands","Norway","Poland","Portugal","Romania","Russia","San Marino","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Turkey","Ukraine","United Kingdom"]
+    country_list.each do |country|
+      country_code = CS.countries.select{|key, hash| hash == country }.keys[0]
+      CS.states(country_code).each do |key,value|
+        CS.cities(key, country_code).each do |city|
+          city = city.gsub(/\s+/, '%20')
+          response = HTTParty.get("https://www.goeuro.com/suggester-api/v2/position/suggest/en/#{city}")
+          response.parsed_response.each do |city|
+            City.find_or_create_by("city_id" => city["_id"],"name" => city["name"], "fullName" => city["fullName"], "country" => city["country"], "latitude" => city["geo_position"]["latitude"], "longitude" => city["geo_position"]["longitude"],"locationId" => city["locationId"], "inEurope" => city["inEurope"], "countryId" => city["countryId"], "countryCode" => city["countryCode"],"coreCountry" => city["coreCountry"],"city_type" => city["type"],"iata_airport_code" => city["iata_airport_code"])
+          end
+        end
+      end
+    end
+  end
+
   task get_flight_details: :environment do 
     cities_name = ["London","Paris","Rome","Dublin","Madrid","Barcelona","Frankfurt","Milan","Athens","Amsterdam"]
     cities = ["LHR","CDG","FCO","DUB","MAD","BCN","FRA","MXP","ATH","AMS"]
