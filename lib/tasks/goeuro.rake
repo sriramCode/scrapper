@@ -27,9 +27,8 @@ namespace :goeuro do
           response = HTTParty.get(URI.parse(encoded_url))
           response.parsed_response.each do |city|
             City.find_or_create_by("city_id" => city["_id"],"name" => city["name"], "fullName" => city["fullName"], "country" => city["country"], "latitude" => city["geo_position"]["latitude"], "longitude" => city["geo_position"]["longitude"],"locationId" => city["locationId"], "inEurope" => city["inEurope"], "countryId" => city["countryId"], "countryCode" => city["countryCode"],"coreCountry" => city["coreCountry"],"city_type" => city["type"],"iata_airport_code" => city["iata_airport_code"])
-            puts response.count
           end
-          
+          puts response.count
         end
       end
       puts "------------------------------------------------"
@@ -52,9 +51,8 @@ namespace :goeuro do
           response = HTTParty.get(URI.parse(encoded_url))
           response.parsed_response.each do |city|
             City.find_or_create_by("city_id" => city["_id"],"name" => city["name"], "fullName" => city["fullName"], "country" => city["country"], "latitude" => city["geo_position"]["latitude"], "longitude" => city["geo_position"]["longitude"],"locationId" => city["locationId"], "inEurope" => city["inEurope"], "countryId" => city["countryId"], "countryCode" => city["countryCode"],"coreCountry" => city["coreCountry"],"city_type" => city["type"],"iata_airport_code" => city["iata_airport_code"])
-             puts response.count
           end
-         
+         puts response.count
         end
       end
       puts "------------------------------------------------"
