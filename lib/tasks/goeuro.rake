@@ -16,6 +16,7 @@ namespace :goeuro do
 
     country_list = ["Latvia","Liechtenstein","Lithuania","Luxembourg","Macedonia","Malta","Moldova","Monaco","Montenegro","Netherlands","Norway","Poland","Portugal","Romania","Russia","San Marino","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Turkey","Ukraine","United Kingdom"]
     country_list.each do |country|
+      puts "Country name: " + country
       country_code = CS.countries.select{|key, hash| hash == country }.keys[0]
       CS.states(country_code).each do |key,value|
         CS.cities(key, country_code).each do |city|
@@ -31,6 +32,7 @@ namespace :goeuro do
           
         end
       end
+      puts "------------------------------------------------"
     end
   end
 
@@ -39,6 +41,7 @@ namespace :goeuro do
 
     # country_list = ["Latvia","Liechtenstein","Lithuania","Luxembourg","Macedonia","Malta","Moldova","Monaco","Montenegro","Netherlands","Norway","Poland","Portugal","Romania","Russia","San Marino","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Turkey","Ukraine","United Kingdom"]
     country_list.each do |country|
+      puts "Country name: " + country
       country_code = CS.countries.select{|key, hash| hash == country }.keys[0]
       CS.states(country_code).each do |key,value|
         CS.cities(key, country_code).each do |city|
@@ -54,6 +57,7 @@ namespace :goeuro do
          
         end
       end
+      puts "------------------------------------------------"
     end
   end
 
